@@ -1,0 +1,122 @@
+<% include partials/_header %>
+
+<div id="wrapper">
+    <div class="line"></div>
+    <div id="mainpanel">
+        <div class="childdiv">
+            <img id="child-img" src="img/man.png"/>
+        </div>
+        <div class="childdiv">
+            <div class="error">
+
+            </div>
+            <div id="form">
+                <div style="background-color:#6785c0;"><Span id="form-title">Please fill below form to verifiy to your purchase</span></div>
+                <div id="form-content">
+                    <form id="customerForm" action="/add" method="POST" enctype="multipart/form-data">
+                        <input type="text" id="name" name="name" placeholder="Name">
+                        <input type="email" id="email" name="email" placeholder="Email">
+                        <input type="text" id="mobile_no" name="mobile_no" placeholder="Mobile Number">
+                        <input type="text" id="address" name="address" placeholder="Address">
+                        <input type="text" id="locker_code" name="locker_code" placeholder="8 Digit Unique Code">
+                        <span style="color:#fff;">Upload your pic: </span> <input type="file" id="profile_img" name="profile_img" placeholder="Upload your pic" accept='image/*'/>
+                        <input type="button" value="Submit" id="btnSub"/>
+                    </form>
+                </div>
+            </div>
+            <div id="mobile-man">
+            
+            </div>
+        </div>
+    </div>
+    <div class="line" id="bottom-line"></div>
+</div>
+<script src="js/jquery-3.6.0.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $('#customerForm').on('submit',(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            console.log(formData);
+
+            $.ajax({
+                type:'POST',
+                url: $(this).attr('action'),
+                data:formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: (res) => {
+                    console.log(res);
+                    if (res.errors) {
+                        $('.error').show();
+                        
+                        var errorsList = '<ul>' 
+
+                        for (var i=0; i<res.errors.length; i++) {
+                            console.log(i);
+                            errorsList += '<li>'+res.errors[i].msg+'</li>'
+                        }
+                        errorsList += '</ul>';
+                        $('.error').html(errorsList);
+                    }
+
+                    if (res.success) {
+                        $('#form').hide();
+                        $('.error').show();
+                        console.log(res.success);
+                        $('.error').html(res.success[0].msg);
+                    }
+                },
+                error: function(data){
+                    console.log("error");
+                    console.log(data);
+                }
+            });
+        }));
+
+        $('#btnSub').on('click', function(e){
+            $('#customerForm').submit();
+        });
+
+        $('#btnSub1').on('click', function(e){
+            $.ajax({
+                method: "POST",
+                url: "/add",
+                data: { 
+                    name: $("#name").val(), 
+                    email: $("#email").val(),
+                    mobile_no: $("#mobile_no").val(),
+                    address: $("#address").val(),
+                    locker_code: $("#locker_code").val(),
+                    profile_img: $("#profile_img").val(),
+                },
+                success: (res) => {
+                    console.log(res);
+                    if (res.errors) {
+                        $('.error').show();
+                        
+                        var errorsList = '<ul>' 
+
+                        for (var i=0; i<res.errors.length; i++) {
+                            console.log(i);
+                            errorsList += '<li>'+res.errors[i].msg+'</li>'
+                        }
+                        errorsList += '</ul>';
+                        $('.error').html(errorsList);
+                    }
+
+                    if (res.success) {
+                        $('#form').hide();
+                        $('.error').show();
+                        console.log(res.success);
+                        $('.error').html(res.success[0].msg);
+                    }
+                }
+            });
+        });
+    });
+</script>
+<% include partials/_footer %>
